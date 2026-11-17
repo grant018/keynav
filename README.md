@@ -38,3 +38,7 @@ E2E uses `$CHROMIUM_PATH`, else `/usr/bin/chromium`, else Playwright's bundled C
 (`npx playwright install chromium`). Branded Chrome no longer accepts `--load-extension`.
 
 `npm run e2e` leaves a test build in `dist/`; run `npm run build` before loading it by hand.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Navigate the web with the keyboard (Chrome extension, Manifest V3).",
+  "license": "MIT",
   "scripts": {
     "build": "node build.mjs",
     "build:test": "node build.mjs --test",
