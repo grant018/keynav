@@ -138,6 +138,37 @@ test.describe('tab commands', () => {
   });
 });
 
+test.describe('history commands', () => {
+  test('H goes back and L goes forward', async ({ context, serviceWorker: sw }) => {
+    const { pages: [a] } = await openWindow(context, sw, ['hotkeys.html']);
+    const first = a!.url();
+    await a!.keyboard.press('Shift+H'); // nothing to go back to: stays put
+    await a!.waitForTimeout(300);
+    expect(a!.url()).toBe(first);
+
+    await a!.goto(`${PAGES}/empty.html`);
+    await tabIdOf(a!); // content script ready
+    await a!.keyboard.press('Shift+H');
+    await a!.waitForURL(first);
+    await tabIdOf(a!);
+    await a!.keyboard.press('Shift+L');
+    await a!.waitForURL(`${PAGES}/empty.html`);
+    expect(await takeLog(a!)).toEqual([]); // the page never saw the keys
+  });
+
+  test('H works with focus inside a cross-origin iframe', async ({ context, serviceWorker: sw }) => {
+    const { pages: [a] } = await openWindow(context, sw, ['empty.html']);
+    const first = a!.url();
+    await a!.goto(`${PAGES}/iframes.html`);
+    const box = (await a!.locator('#cross').boundingBox())!;
+    await a!.mouse.click(box.x + 300, box.y + 80); // empty area inside the frame
+    const frame = a!.frames().find((f) => f.url().includes('?cross'))!;
+    expect(await frame.evaluate(() => document.hasFocus())).toBe(true);
+    await a!.keyboard.press('Shift+H');
+    await a!.waitForURL(first);
+  });
+});
+
 test('f on a javascript: link runs it (clicked from the page world)', async ({ serviceWorker: _sw, page }) => {
   await page.goto(`${PAGES}/newtab.html`);
   await pick(page, 'js');

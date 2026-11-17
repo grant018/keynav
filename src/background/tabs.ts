@@ -38,3 +38,13 @@ export async function restoreTab(): Promise<void> {
   const sessionId = recent.find((s) => s.tab?.sessionId)?.tab?.sessionId;
   if (sessionId) await chrome.sessions.restore(sessionId);
 }
+
+/**
+ * Go back (-1) or forward (1) in the tab's history. Done here rather than with
+ * history.back() in the page so it works the same from any frame. Nothing to go
+ * back or forward to is not an error.
+ */
+export async function goHistory(tab: Tab, delta: 1 | -1): Promise<void> {
+  if (tab.id === undefined) return;
+  await (delta < 0 ? chrome.tabs.goBack(tab.id) : chrome.tabs.goForward(tab.id)).catch(() => {});
+}

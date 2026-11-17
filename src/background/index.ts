@@ -4,7 +4,7 @@
 import type { Message, Reply } from '../shared/messages';
 import { loadSettings, onSettingsChanged, saveSettings } from '../shared/settings';
 import { broadcast, startHints } from './hints';
-import { closeTab, openTab, restoreTab, switchTab } from './tabs';
+import { closeTab, goHistory, openTab, restoreTab, switchTab } from './tabs';
 
 async function handle(msg: Message, sender: chrome.runtime.MessageSender): Promise<Reply> {
   const tab = sender.tab;
@@ -27,6 +27,9 @@ async function handle(msg: Message, sender: chrome.runtime.MessageSender): Promi
       break;
     case 'restoreTab':
       await restoreTab();
+      break;
+    case 'history':
+      await goHistory(tab, msg.delta);
       break;
     case 'hints:start':
       return { type: 'hints:started', total: await startHints(tab, msg.session, msg.mode, msg.chars) };

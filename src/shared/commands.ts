@@ -14,6 +14,8 @@ export const COMMANDS = {
   restoreTab: { group: 'Tabs', description: 'Reopen the last closed tab' },
   previousTab: { group: 'Tabs', description: 'Go to the tab on the left' },
   nextTab: { group: 'Tabs', description: 'Go to the tab on the right' },
+  goBack: { group: 'History', description: 'Go back' },
+  goForward: { group: 'History', description: 'Go forward' },
   passThrough: { group: 'Modes', description: 'Send all keys to the page until Esc' },
   showHelp: { group: 'Modes', description: 'Show this help' },
 } as const;
@@ -37,6 +39,8 @@ export const DEFAULT_KEYS: Readonly<Record<string, CommandName>> = {
   X: 'restoreTab',
   J: 'previousTab',
   K: 'nextTab',
+  H: 'goBack',
+  L: 'goForward',
   i: 'passThrough',
   '?': 'showHelp',
 };

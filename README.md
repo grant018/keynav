@@ -6,7 +6,7 @@ Navigate the web with the keyboard. Chrome extension, Manifest V3.
 
 Press `?` on any page for the keys. Defaults: `j`/`k` scroll (hold to keep going), `d`/`u` half
 page, `gg`/`G` top/bottom, `f` click a link or control, `F` open a link in a new tab and switch to it,
-`x`/`X` close/reopen a tab, `J`/`K` tab left/right, `i` send keys to the page until `Esc`.
+`x`/`X` close/reopen a tab, `J`/`K` tab left/right, `H`/`L` back/forward, `i` send keys to the page until `Esc`.
 
 Settings (right-click the toolbar button → Options): site rules, key mappings, hint characters,
 scrolling. Clicking the toolbar button, or `Alt+Shift+K`, turns KeyNav on/off everywhere.

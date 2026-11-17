@@ -8,6 +8,7 @@ export type Message =
   | { type: 'closeTab' }
   | { type: 'switchTab'; delta: 1 | -1 } // -1 = tab to the left, wraps around
   | { type: 'restoreTab' } // most recently closed tab
+  | { type: 'history'; delta: 1 | -1 } // -1 = back, 1 = forward
   | { type: 'openOptions' }
   // Link hints across frames (see src/content/hints/controller.ts):
   | { type: 'hints:start'; session: string; mode: HintMode; chars: string }
