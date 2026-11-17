@@ -12,7 +12,8 @@
     "test": "vitest run",
     "e2e": "node build.mjs --test && playwright test",
     "serve": "node test/serve.mjs",
-    "perf": "node build.mjs --test && PERF=1 playwright test --workers=1"
+    "perf": "node build.mjs --test && PERF=1 playwright test --workers=1",
+    "icons": "node scripts/make-icons.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

@@ -3,12 +3,26 @@
   "name": "KeyNav",
   "version": "0.1.0",
   "description": "Navigate the web with the keyboard.",
-  "permissions": ["sessions", "storage", "webNavigation"],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": [
+    "sessions",
+    "storage",
+    "webNavigation"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
   "action": {
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    },
     "default_title": "KeyNav is on (click to turn off)"
   },
   "options_ui": {
@@ -17,7 +31,9 @@
   },
   "commands": {
     "toggle": {
-      "suggested_key": { "default": "Alt+Shift+K" },
+      "suggested_key": {
+        "default": "Alt+Shift+K"
+      },
       "description": "Turn KeyNav on or off"
     },
     "previous-tab": {
@@ -29,15 +45,23 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
       "all_frames": true,
       "match_origin_as_fallback": true,
       "run_at": "document_start"
     },
     {
-      "matches": ["<all_urls>"],
-      "js": ["main.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "main.js"
+      ],
       "world": "MAIN",
       "all_frames": true,
       "match_origin_as_fallback": true,

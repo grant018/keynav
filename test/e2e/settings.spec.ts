@@ -78,6 +78,16 @@ test.describe('site rules', () => {
   });
 });
 
+test('the toolbar icons are packaged in the built extension', async ({ serviceWorker: sw }) => {
+  const missing = await sw.evaluate(async () => {
+    const paths = ['icon', 'off'].flatMap((n) => [16, 32].map((s) => `icons/${n}-${s}.png`))
+      .concat([48, 128].map((s) => `icons/icon-${s}.png`));
+    const results = await Promise.all(paths.map(async (p) => ((await fetch(chrome.runtime.getURL(p))).ok ? null : p)));
+    return results.filter(Boolean);
+  });
+  expect(missing).toEqual([]);
+});
+
 test('the on/off switch turns KeyNav off everywhere and shows OFF on the toolbar button', async ({ serviceWorker: sw, page }) => {
   await page.goto(`${PAGES}/hotkeys.html`);
   await expect.poll(() => page.evaluate(() => document.documentElement.dataset.keynavSettings)).toBeTruthy();

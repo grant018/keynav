@@ -31,6 +31,9 @@ npm run perf         # hint-collection timing tests (@perf), run alone, one at a
 npm run serve        # serve test/pages on http://127.0.0.1:8765 for manual checks
 ```
 
+The icon's source is `icons/icon.svg`; after editing it, `npm run icons` re-renders the PNGs
+(normal and grey "off" sets) with headless Chromium.
+
 E2E uses `$CHROMIUM_PATH`, else `/usr/bin/chromium`, else Playwright's bundled Chromium
 (`npx playwright install chromium`). Branded Chrome no longer accepts `--load-extension`.
 

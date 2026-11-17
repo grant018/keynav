@@ -56,6 +56,8 @@ async function toggle(): Promise<boolean> {
 async function showBadge(enabled: boolean): Promise<void> {
   await chrome.action.setBadgeBackgroundColor({ color: '#6e7781' });
   await chrome.action.setBadgeText({ text: enabled ? '' : 'OFF' });
+  const icon = enabled ? 'icon' : 'off'; // grey keycap while off
+  await chrome.action.setIcon({ path: { 16: `icons/${icon}-16.png`, 32: `icons/${icon}-32.png` } });
   await chrome.action.setTitle({ title: enabled ? 'KeyNav is on (click to turn off)' : 'KeyNav is off (click to turn on)' });
 }
 

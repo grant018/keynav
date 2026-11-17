@@ -3,7 +3,7 @@
 //   node build.mjs --test    test build (__TEST__ = true: open shadow roots, test hooks)
 //   node build.mjs --watch   rebuild on change
 import * as esbuild from 'esbuild';
-import { copyFile, mkdir, rm } from 'node:fs/promises';
+import { copyFile, cp, mkdir, rm } from 'node:fs/promises';
 
 const args = new Set(process.argv.slice(2));
 const isTest = args.has('--test');
@@ -28,6 +28,7 @@ const copyStatic = {
     build.onEnd(async () => {
       await copyFile('manifest.json', `${outdir}/manifest.json`);
       await copyFile('src/options/options.html', `${outdir}/options.html`);
+      await cp('icons', `${outdir}/icons`, { recursive: true, filter: (f) => !f.endsWith('.svg') });
     });
   },
 };
