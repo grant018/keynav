@@ -1,0 +1,39 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>visibility</title>
+<!-- data-expect="hint": must get a hint. data-expect="none": must not. -->
+<style>
+  body { font: 14px sans-serif; margin: 0; padding-top: 50px; }
+  header { position: fixed; top: 0; left: 0; right: 0; height: 40px; background: #333; }
+  header a { color: #fff; }
+  .narrow { width: 120px; }
+  .float { float: left; width: 60px; height: 40px; background: #9cf; }
+  .clearfix::after { content: ""; display: block; clear: both; }
+  .file-label { position: relative; display: inline-block; padding: 4px 8px; background: #ddd; }
+  .file-label input { position: absolute; inset: 0; opacity: 0; }
+  .below { position: absolute; top: 3000px; }
+</style>
+<header><a id="fixed-header" data-expect="hint" href="#h">Header link</a></header>
+
+<p><a id="plain" data-expect="hint" href="#p">Plain link</a></p>
+<div class="narrow"><a id="wrapped" data-expect="hint" href="#w">This link wraps across several lines of text</a></div>
+<div class="clearfix"><a id="float-wrapper" data-expect="hint" href="#f"><span class="float"></span></a></div>
+<p><label class="file-label">Choose file<input id="opacity-file" data-expect="hint" type="file"></label></p>
+<p>
+  <div id="role-button" data-expect="hint" role="button">role=button</div>
+  <span id="onclick" data-expect="hint" onclick="">onclick span</span>
+  <span id="ce" data-expect="hint" contenteditable="true">editable</span>
+</p>
+<details><summary id="summary" data-expect="hint">Summary</summary></details>
+
+<div style="display: none"><a id="display-none" data-expect="none" href="#x">display: none</a></div>
+<div style="visibility: hidden"><a id="visibility-hidden" data-expect="none" href="#x">visibility: hidden</a></div>
+<a id="offscreen" data-expect="none" href="#x" style="position: absolute; left: -9999px">off-screen</a>
+<a id="empty" data-expect="none" href="#x"></a>
+<button id="disabled" data-expect="none" disabled>disabled</button>
+<div inert><a id="inert" data-expect="none" href="#x">inside inert</a></div>
+<div id="aria-disabled" data-expect="none" role="button" aria-disabled="true">aria-disabled</div>
+<input id="hidden-input" data-expect="none" type="hidden">
+<span id="ce-false" data-expect="none" contenteditable="false">contenteditable=false</span>
+<a id="no-href" data-expect="none">anchor without href</a>
+<a id="below-fold" data-expect="none" class="below" href="#x">below the fold</a>

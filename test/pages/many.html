@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>many</title>
+<!--
+  A heavy page: 2000 links among ~12000 other elements.
+    many.html          10 columns: ~400 links on screen (a dense real page)
+    many.html?dense    40 columns: all 2000 links on screen (worst case)
+-->
+<style>
+  body { font: 10px sans-serif; margin: 0; }
+  .grid { display: grid; }
+  .cell { overflow: hidden; white-space: nowrap; line-height: 18px; }
+  .cell:nth-child(7n) { cursor: pointer; }
+</style>
+<div class="grid" id="grid"></div>
+<script>
+  const grid = document.getElementById('grid');
+  const columns = location.search.includes('dense') ? 40 : 10;
+  grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+  if (columns === 40) grid.querySelector && (document.body.style.lineHeight = '0');
+  const parts = [];
+  for (let i = 0; i < 2000; i++) {
+    parts.push(`<div class="cell"><span><b><i><a href="#l${i}">l${i}</a></i></b></span><span>x</span></div>`);
+  }
+  grid.innerHTML = parts.join('');
+  if (columns === 40) for (const c of grid.children) c.style.lineHeight = '12px';
+</script>

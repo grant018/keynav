@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "KeyNav",
+  "version": "0.1.0",
+  "description": "Navigate the web with the keyboard.",
+  "permissions": ["sessions", "storage"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "KeyNav is on (click to turn off)"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "commands": {
+    "toggle": {
+      "suggested_key": { "default": "Alt+Shift+K" },
+      "description": "Turn KeyNav on or off"
+    },
+    "previous-tab": {
+      "description": "Go to the tab on the left (works on every page)"
+    },
+    "next-tab": {
+      "description": "Go to the tab on the right (works on every page)"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "all_frames": true,
+      "match_origin_as_fallback": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["main.js"],
+      "world": "MAIN",
+      "all_frames": true,
+      "match_origin_as_fallback": true,
+      "run_at": "document_start"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>clickable divs</title>
+<!-- data-expect="hint": must get a hint. data-expect="none": must not. -->
+<style>
+  body { font: 14px sans-serif; }
+  .box { border: 1px solid #999; padding: 4px; margin: 6px 0; }
+  .pointer { cursor: pointer; }
+</style>
+
+<div id="cursor-div" data-expect="hint" class="box pointer">div with cursor: pointer
+  <span id="cursor-child" data-expect="none">child inherits the pointer</span>
+</div>
+<div id="tabindex-div" data-expect="hint" class="box" tabindex="0">tabindex=0</div>
+<div id="tabindex-neg" data-expect="none" class="box" tabindex="-1">tabindex=-1</div>
+<div id="jsaction" data-expect="hint" class="box" jsaction="click:abc">jsaction click</div>
+<div id="jsaction-default" data-expect="hint" class="box" jsaction="abc.def">jsaction default</div>
+<div id="jsaction-hover" data-expect="none" class="box" jsaction="mouseover:abc">jsaction mouseover only</div>
+<div id="haspopup" data-expect="hint" class="box" aria-haspopup="menu">aria-haspopup</div>
+
+<div id="card" data-expect="none" class="box pointer">clickable card around
+  <a id="card-link" data-expect="hint" href="#card">its own link</a>
+</div>
+<a id="wrap-link" data-expect="hint" href="#wrap">link with <span id="inner-pointer" data-expect="none" class="pointer">an explicit pointer span</span></a>
+
+<a id="outer-same" data-expect="none" href="#same" style="display: block; width: 200px"><div id="inner-same" data-expect="hint" role="button">button filling a link</div></a>
+
+<label id="label-wrap" data-expect="none" class="box pointer"><input id="chk" data-expect="hint" type="checkbox"> label around a checkbox</label>
+<label id="label-for" data-expect="none" class="box pointer" for="chk2">label for a visible checkbox</label>
+<input id="chk2" data-expect="hint" type="checkbox">
+<label id="label-hidden-control" data-expect="hint" class="box pointer" for="chk3">label for a hidden checkbox</label>
+<input id="chk3" data-expect="none" type="checkbox" style="display: none">
+
+<script>
+  for (const id of ['cursor-div', 'tabindex-div', 'jsaction', 'card']) {
+    document.getElementById(id).addEventListener('click', () => (window.__events ??= []).push(id));
+  }
+</script>

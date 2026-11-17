@@ -1,0 +1,10 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>empty</title>
+<p>Nothing to click here.</p>
+<script>
+  window.__log = [];
+  for (const type of ['keydown', 'keypress', 'keyup']) {
+    window.addEventListener(type, (e) => window.__log.push(`${type}:${e.key}`), true);
+  }
+</script>

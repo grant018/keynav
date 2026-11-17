@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>covered and clipped</title>
+<!-- data-expect="hint": must get a hint. data-expect="none": must not. -->
+<style>
+  body { font: 14px sans-serif; margin: 0; padding: 80px 10px 10px; }
+  header { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #333; z-index: 10; }
+  .rel { position: relative; margin: 10px 0; }
+  .cover { position: absolute; inset: 0; background: rgb(200 0 0 / 0.9); }
+  .half { position: absolute; top: 0; bottom: 0; left: 0; width: 50%; background: rgb(200 0 0 / 0.9); }
+  .clip { height: 30px; overflow: hidden; border: 1px solid #999; margin: 10px 0; }
+  .scroller { height: 40px; overflow: auto; border: 1px solid #999; margin: 10px 0; }
+</style>
+<header></header>
+<a id="under-header" data-expect="none" href="#x" style="position: fixed; top: 20px; left: 10px">under the fixed header</a>
+
+<p><a id="visible" data-expect="hint" href="#v">plain visible link</a></p>
+<div class="rel"><a id="covered" data-expect="none" href="#x">fully covered by an overlay</a><div class="cover"></div></div>
+<div class="rel" style="display: inline-block"><a id="half-covered" data-expect="hint" href="#h">left half covered by an overlay, right half visible</a><div class="half"></div></div>
+<div class="rel"><a id="see-through" data-expect="hint" href="#s">covered by a pointer-events: none overlay</a><div class="cover" style="pointer-events: none"></div></div>
+<div class="clip"><div style="height: 60px"></div><a id="clipped" data-expect="none" href="#x">clipped by overflow: hidden</a></div>
+<div class="scroller" id="scroller">
+  <a id="in-scroller" data-expect="hint" href="#i">visible inside a scroller</a>
+  <div style="height: 200px"></div>
+  <a id="scrolled-away" data-expect="none" href="#x">scrolled out of its scroller</a>
+</div>

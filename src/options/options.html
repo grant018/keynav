@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KeyNav settings</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f8fa; --card: #ffffff; --text: #1f2328; --muted: #656d76; --border: #d0d7de;
+    --accent: #0969da; --danger: #cf222e; --ok: #1a7f37; --field: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --card: #161b22; --text: #e6edf3; --muted: #8d96a0; --border: #30363d;
+      --accent: #4493f8; --danger: #f85149; --ok: #3fb950; --field: #0d1117;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+  h1 { margin: 0; font-size: 22px; }
+  h2 { margin: 0 0 4px; font-size: 16px; }
+  section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  p.help { margin: 0 0 12px; color: var(--muted); }
+  code, kbd, textarea, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  code { font-size: 12.5px; }
+  input[type=text], input[type=number], textarea {
+    font: inherit; color: inherit; background: var(--field);
+    border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; width: 100%;
+  }
+  input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  textarea { min-height: 120px; resize: vertical; font-size: 13px; }
+  button { font: inherit; color: inherit; background: var(--field); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+  button.link { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; }
+  .rules { display: grid; grid-template-columns: 1fr 160px auto; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .rules .head { font-size: 12px; color: var(--muted); }
+  .rules button { padding: 4px 10px; }
+  .row { display: grid; grid-template-columns: 1fr 140px; gap: 12px; align-items: center; margin: 8px 0; }
+  .row label { display: block; }
+  .row small { display: block; color: var(--muted); }
+  .switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; }
+  .switch input { width: 18px; height: 18px; }
+  .errors { margin: 8px 0 0; padding: 0; list-style: none; color: var(--danger); font-size: 13px; }
+  .error { color: var(--danger); font-size: 13px; min-height: 1.2em; margin-top: 4px; }
+  #status { color: var(--ok); font-size: 13px; min-height: 1.2em; }
+  details summary { cursor: pointer; color: var(--accent); margin-top: 10px; }
+  table { border-collapse: collapse; margin-top: 8px; width: 100%; font-size: 13px; }
+  td { padding: 3px 8px 3px 0; vertical-align: top; border-top: 1px solid var(--border); }
+  td:first-child { white-space: nowrap; }
+  @media (max-width: 560px) {
+    .rules { grid-template-columns: 1fr 90px auto; }
+    .row { grid-template-columns: 1fr 100px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>KeyNav</h1>
+    <label class="switch"><input type="checkbox" id="enabled"> On</label>
+  </header>
+
+  <section aria-labelledby="rules-title">
+    <h2 id="rules-title">Site rules</h2>
+    <p class="help">
+      Turn KeyNav off on a site, or let the site keep some of its own keys.
+      Leave <b>pass keys</b> empty to turn KeyNav off there. Patterns accept <code>*</code>:
+      <code>mail.google.com</code>, <code>*.google.com</code>, <code>https://example.com/app/*</code>.
+    </p>
+    <div class="rules" id="rules"></div>
+    <button type="button" id="add-rule">Add rule</button>
+    <div class="error" id="rules-error" role="alert"></div>
+  </section>
+
+  <section aria-labelledby="keys-title">
+    <h2 id="keys-title">Key mappings</h2>
+    <p class="help">
+      One per line: <code>map gt nextTab</code>, <code>unmap x</code>, <code>unmapAll</code>.
+      Lines starting with <code>#</code> are comments. Press <kbd>?</kbd> on any page to see your keys.
+    </p>
+    <textarea id="keymap" spellcheck="false" aria-describedby="keymap-errors" placeholder="# map gt nextTab&#10;# unmap x"></textarea>
+    <ul class="errors" id="keymap-errors" role="alert"></ul>
+    <details>
+      <summary>Commands and default keys</summary>
+      <table id="commands"></table>
+    </details>
+  </section>
+
+  <section aria-labelledby="hints-title">
+    <h2 id="hints-title">Link hints</h2>
+    <div class="row">
+      <label for="hint-chars">Hint characters<small>Letters used for labels, easiest first.</small></label>
+      <input type="text" id="hint-chars" class="mono" spellcheck="false" aria-describedby="hint-chars-error">
+    </div>
+    <div class="error" id="hint-chars-error" role="alert"></div>
+  </section>
+
+  <section aria-labelledby="scroll-title">
+    <h2 id="scroll-title">Scrolling</h2>
+    <div class="row">
+      <label for="scroll-step">Step<small>Pixels per tap of <kbd>j</kbd>/<kbd>k</kbd>.</small></label>
+      <input type="number" id="scroll-step" step="10">
+    </div>
+    <div class="row">
+      <label for="scroll-speed">Hold speed<small>Pixels per second while <kbd>j</kbd>/<kbd>k</kbd> is held.</small></label>
+      <input type="number" id="scroll-speed" step="100">
+    </div>
+    <label class="switch" style="font-weight: normal"><input type="checkbox" id="smooth"> Smooth scrolling</label>
+  </section>
+
+  <section aria-labelledby="shortcuts-title">
+    <h2 id="shortcuts-title">Browser shortcuts</h2>
+    <p class="help" style="margin: 0">
+      These work on every page, including ones KeyNav can't run on: turn KeyNav on/off
+      (<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> by default), and switch tabs left/right (no keys set).
+      <button type="button" class="link" id="open-shortcuts">Change them in Chrome</button>
+    </p>
+  </section>
+
+  <div id="status" role="status" aria-live="polite"></div>
+</main>
+<script src="options.js"></script>
+</body>
+</html>

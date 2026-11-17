@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>shadow DOM</title>
+<style>body { font: 14px sans-serif; } x-open, x-closed, x-outer { display: block; margin: 6px 0; }</style>
+<p><a id="light" href="#light">light DOM link</a></p>
+<x-open id="open-host"></x-open>
+<x-closed id="closed-host"></x-closed>
+<x-outer id="outer-host"></x-outer>
+<x-slotter id="slot-host"><a id="slotted" href="#slotted">slotted light-DOM link</a></x-slotter>
+<script>
+  window.__events = [];
+  const log = (id) => () => window.__events.push(id);
+
+  const open = document.getElementById('open-host').attachShadow({ mode: 'open' });
+  open.innerHTML = '<button id="open-button">open shadow button</button> <a id="open-link" href="frame.html?shadow">open shadow link</a>';
+  open.getElementById('open-button').addEventListener('click', log('open-button'));
+
+  const closed = document.getElementById('closed-host').attachShadow({ mode: 'closed' });
+  closed.innerHTML = '<button id="closed-button">closed shadow button</button>';
+  closed.getElementById('closed-button').addEventListener('click', log('closed-button'));
+
+  const outer = document.getElementById('outer-host').attachShadow({ mode: 'open' });
+  outer.innerHTML = '<p>outer shadow</p><x-inner id="inner-host"></x-inner>';
+  const inner = outer.getElementById('inner-host').attachShadow({ mode: 'open' });
+  inner.innerHTML = '<div id="nested-pointer" style="cursor: pointer">nested shadow, cursor: pointer</div>';
+  inner.getElementById('nested-pointer').addEventListener('click', log('nested-pointer'));
+
+  document.getElementById('slot-host').attachShadow({ mode: 'open' }).innerHTML = '<p>before <slot></slot> after</p>';
+</script>

@@ -1,0 +1,54 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>hover menus</title>
+<style>
+  body { font: 14px sans-serif; }
+  nav > ul { display: flex; gap: 24px; list-style: none; padding: 0; }
+  nav li { position: relative; }
+  nav ul ul { position: absolute; top: 100%; left: 0; background: #eee; padding: 6px 12px; list-style: none; }
+  #portal-menu { position: absolute; top: 60px; left: 300px; background: #eee; padding: 6px 12px; }
+  #other { margin-top: 120px; }
+</style>
+<nav>
+  <ul>
+    <!-- Opens on mouseenter of the <li> (plain JS, synchronous) - the WSJ "Arts" pattern. -->
+    <li id="arts-item"><a id="arts" href="frame.html?arts">Arts</a>
+      <ul id="arts-menu" hidden>
+        <li><a id="books" href="frame.html?books">Books</a></li>
+        <li><a id="film" href="frame.html?film">Film</a></li>
+      </ul>
+    </li>
+    <!-- Opens a moment after mouseover (like a React state update). -->
+    <li id="opinion-item"><a id="opinion" href="frame.html?opinion">Opinion</a>
+      <ul id="opinion-menu" hidden><li><a id="columns" href="frame.html?columns">Columns</a></li></ul>
+    </li>
+    <!-- Renders its menu at the end of <body> (a "portal"). -->
+    <li><a id="portal" href="frame.html?portal">Portal</a></li>
+    <!-- No menu. -->
+    <li><a id="plain" href="frame.html?plain">Plain</a></li>
+  </ul>
+</nav>
+<p>Busy ticker (unrelated DOM changes): <span id="ticker"></span></p>
+<button id="other">Other</button>
+<script>
+  const artsItem = document.getElementById('arts-item');
+  const artsMenu = document.getElementById('arts-menu');
+  artsItem.addEventListener('mouseenter', () => (artsMenu.hidden = false));
+  artsItem.addEventListener('mouseleave', () => (artsMenu.hidden = true));
+
+  const opinionItem = document.getElementById('opinion-item');
+  const opinionMenu = document.getElementById('opinion-menu');
+  opinionItem.addEventListener('mouseover', () => setTimeout(() => (opinionMenu.hidden = false), 20));
+  opinionItem.addEventListener('mouseout', (e) => {
+    if (!opinionItem.contains(e.relatedTarget)) opinionMenu.hidden = true;
+  });
+
+  document.getElementById('portal').addEventListener('mouseenter', () => {
+    if (document.getElementById('portal-menu')) return;
+    document.body.insertAdjacentHTML('beforeend',
+      '<div id="portal-menu"><a id="portal-link" href="frame.html?portal-link">Portal item</a></div>');
+  });
+
+  const ticker = document.getElementById('ticker');
+  setInterval(() => (ticker.textContent = String(Date.now())), 10);
+</script>

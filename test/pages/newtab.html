@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>newtab</title>
+<style>body { font: 14px sans-serif; } p { margin: 6px 0; }</style>
+<p><a id="relative" href="frame.html?relative">relative link</a></p>
+<p><a id="blank" href="frame.html?blank" target="_blank">target=_blank link</a></p>
+<p><a id="js" href="javascript:window.__events.push('js')">javascript: link</a></p>
+<p><div id="div-handler" role="button">div with a click handler</div></p>
+<p><a id="wrapper" href="frame.html?wrapper">link around <span id="inner" onclick="">a clickable span</span></a></p>
+<script>
+  window.__events = [];
+  window.__log = [];
+  for (const type of ['keydown', 'keypress', 'keyup']) {
+    window.addEventListener(type, (e) => window.__log.push(`${type}:${e.key}`), true);
+  }
+  document.getElementById('div-handler').addEventListener('click', () => window.__events.push('div'));
+</script>

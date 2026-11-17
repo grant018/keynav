@@ -1,0 +1,33 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>hotkeys</title>
+<style>
+  body { font: 14px sans-serif; }
+  .tall { height: 5000px; background: linear-gradient(#eef, #fee); }
+  [contenteditable], [role=textbox] { border: 1px solid #888; min-height: 1.5em; padding: 2px; }
+</style>
+<h1>Hotkeys</h1>
+<p>Logs every keydown, keypress and keyup the page receives into <code>window.__log</code>.</p>
+<p>
+  <input id="text" placeholder="text input">
+  <input id="readonly" readonly value="read-only">
+  <input id="checkbox" type="checkbox">
+  <select id="select"><option>alpha</option><option>juliet</option></select>
+</p>
+<p><textarea id="textarea"></textarea></p>
+<div id="ce" contenteditable="true"></div>
+<div id="role-textbox" role="textbox" tabindex="0"></div>
+<div id="open-host"></div>
+<div id="closed-host"></div>
+<div class="tall"></div>
+<script>
+  window.__log = [];
+  for (const type of ['keydown', 'keypress', 'keyup']) {
+    window.addEventListener(type, (e) => window.__log.push(`${type}:${e.key}`), true);
+  }
+  document.getElementById('open-host').attachShadow({ mode: 'open' }).innerHTML =
+    '<input id="open-input" placeholder="open shadow input">';
+  const closed = document.getElementById('closed-host').attachShadow({ mode: 'closed' });
+  closed.innerHTML = '<input placeholder="closed shadow input">';
+  window.__closedInput = closed.querySelector('input'); // for tests only
+</script>

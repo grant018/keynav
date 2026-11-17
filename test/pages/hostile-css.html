@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>hostile css</title>
+<style>
+  /* A transform on <html> makes position: fixed relative to <html> instead of the
+     viewport, so a non-top-layer overlay would drift when the page scrolls. */
+  html { transform: translate(0, 0); }
+  body { margin: 0; font: 14px sans-serif; }
+  /* Rules aimed at anything we might inject. */
+  keynav-hints, keynav-hints *, div, span { display: none !important; }
+  * { text-transform: lowercase !important; font-size: 30px !important; line-height: 4 !important; }
+  .tall { height: 4000px; display: block !important; }
+  p { display: block !important; }
+</style>
+<p style="margin-top: 400px"><a id="a1" href="#1">first</a> <a id="a2" href="#2">second</a></p>
+<p><button id="b1">button</button></p>
+<p class="tall"></p>
+<dialog id="dlg"><a id="in-dialog" href="#d">link in dialog</a></dialog>

@@ -1,0 +1,25 @@
+{
+  "name": "keynav",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Navigate the web with the keyboard (Chrome extension, Manifest V3).",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:test": "node build.mjs --test",
+    "watch": "node build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "node build.mjs --test && playwright test",
+    "serve": "node test/serve.mjs",
+    "perf": "node build.mjs --test && PERF=1 playwright test --workers=1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/chrome": "^0.3.7",
+    "@types/node": "^26.6.6",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
