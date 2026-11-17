@@ -1,107 +1,109 @@
-// Link-hint mode: label every visible clickable element; typing a label picks it.
+// Link-hint mode, driven from the frame where `f` (or `F`) was pressed. Every frame
+// in the tab shows labels (see session.ts); this frame owns the keyboard:
 //   Esc          leave without picking
 //   Backspace    undo the last typed letter
 //   other letters that match no label are swallowed and ignored
 //   non-character keys (Tab, arrows, Enter) leave hint mode and reach the page
 // Hint mode also ends on scroll, resize, mouse click, window blur and page unload.
+//
+// All frames derive their labels from the same total and alphabet, so this frame
+// knows every label without asking: it can tell when one is complete, and only the
+// frame that owns it acts. A label owned here is activated synchronously, inside the
+// keypress, keeping its user activation (needed for popups and file pickers).
+import { fire, send, type HintEvent, type HintMode } from '../../shared/messages';
 import { grabKeys } from '../keys/grab';
 import { normalizeKey } from '../keys/normalize';
-import * as smooth from '../scroll/smooth';
-import { activate } from './activate';
-import { collectTargets } from './candidates';
-import { makeLabels } from './labels';
 import { settings } from '../settings';
-import { createOverlay } from './overlay';
+import { makeLabels } from './labels';
+import { endLocal, filter, onSessionEnd, pick, prepare, show } from './session';
 
 const MODIFIERS = new Set(['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'AltGraph']);
 
-let session: { exit(): void } | null = null;
+let cancelCurrent: (() => void) | null = null;
 
-export function showHints(onPick: (el: Element) => void = activate): void {
-  session?.exit();
-  smooth.stop(); // a glide still running would fire scroll events and end hint mode
-
-  const t0 = performance.now();
-  const targets = collectTargets();
-  if (__TEST__) {
-    const ms = performance.now() - t0;
-    document.documentElement.dataset.keynavHintMs = ms.toFixed(1);
-    console.debug(`[keynav] ${targets.length} hints in ${ms.toFixed(1)} ms`);
-  }
-  if (!targets.length) return;
-
-  const alphabet = settings().hintChars;
-  const labels = makeLabels(targets.length, alphabet);
-  const overlay = createOverlay();
-  const hints = targets.map((t, i) => {
-    const label = labels[i]!;
-    return { el: t.el, label, tag: overlay.add(label, t.rect, t.el) };
-  });
+export function showHints(mode: HintMode = 'click'): void {
+  cancelCurrent?.();
+  const session = crypto.randomUUID();
+  const chars = settings().hintChars;
+  let labels: string[] | null = null; // null until every frame has counted
   let typed = '';
+  const early: string[] = []; // letters typed before the labels were known
 
-  const render = () => {
-    for (const h of hints) overlay.update(h.tag, h.label, typed);
+  const broadcast = (event: HintEvent) => fire({ type: 'hints:broadcast', event });
+
+  const finish = () => {
+    if (cancelCurrent !== cancel) return;
+    cancelCurrent = null;
+    ungrab();
+    stopWatching();
+    removeEventListener('blur', onBlur, true);
+    removeEventListener('pagehide', cancel, true);
+  };
+  const cancel = () => {
+    finish();
+    endLocal(session);
+    broadcast({ type: 'hints:end', session });
+  };
+  const onBlur = (e: Event) => e.target === window && cancel();
+
+  const type = (key: string) => {
+    if (!labels) return void early.push(key);
+    const next = typed + key;
+    if (!labels.some((l) => l.startsWith(next))) return;
+    typed = next;
+    if (labels.includes(typed)) {
+      finish();
+      if (!pick(session, typed)) broadcast({ type: 'hints:pick', session, label: typed });
+      else broadcast({ type: 'hints:end', session });
+    } else {
+      filter(session, typed);
+      broadcast({ type: 'hints:typed', session, typed });
+    }
   };
 
-  const onKey = (e: KeyboardEvent): boolean => {
+  const ungrab = grabKeys((e) => {
     if (MODIFIERS.has(e.key)) return false;
     if (e.key === 'Escape') {
-      exit();
+      cancel();
       return true;
     }
     if (e.key === 'Backspace') {
-      typed = typed.slice(0, -1);
-      render();
+      if (early.length) early.pop();
+      else if (labels) {
+        typed = typed.slice(0, -1);
+        filter(session, typed);
+        broadcast({ type: 'hints:typed', session, typed });
+      }
       return true;
     }
     if (e.ctrlKey || e.altKey || e.metaKey) return false;
-
     const key = normalizeKey(e)?.toLowerCase();
     if (!key) {
-      exit(); // Tab, arrows, Enter...: the user moved on
+      cancel(); // Tab, arrows, Enter...: the user moved on
       return false;
     }
-    if (key.length !== 1 || !alphabet.includes(key)) return true;
-
-    const next = typed + key;
-    if (!hints.some((h) => h.label.startsWith(next))) return true;
-    typed = next;
-
-    const picked = hints.find((h) => h.label === typed); // unique: labels are prefix-free
-    if (picked) {
-      exit();
-      onPick(picked.el);
-    } else {
-      render();
-    }
+    if (key.length === 1 && chars.includes(key)) type(key);
     return true;
+  });
+  const stopWatching = onSessionEnd((s) => s === session && finish());
+  addEventListener('blur', onBlur, true);
+  addEventListener('pagehide', cancel, true);
+  cancelCurrent = cancel;
+
+  const ready = (total: number) => {
+    if (cancelCurrent !== cancel) return;
+    if (!total) return finish();
+    labels = makeLabels(total, chars);
+    for (const key of early.splice(0)) type(key);
   };
 
-  const onScroll = (e: Event) => {
-    const t = e.target;
-    if (t === document || t === document.scrollingElement || (t instanceof Node && hints.some((h) => t.contains(h.el)))) {
-      exit();
-    }
-  };
-  const onBlur = (e: Event) => e.target === window && exit();
-
-  const listeners: [string, EventListener][] = [
-    ['scroll', onScroll],
-    ['resize', exit],
-    ['mousedown', exit],
-    ['blur', onBlur],
-    ['pagehide', exit],
-  ];
-  for (const [type, fn] of listeners) window.addEventListener(type, fn, true);
-  const ungrab = grabKeys(onKey);
-
-  function exit(): void {
-    if (session !== current) return;
-    session = null;
-    ungrab();
-    for (const [type, fn] of listeners) window.removeEventListener(type, fn, true);
-    overlay.remove();
-  }
-  const current = { exit };
-  session = current;
+  send({ type: 'hints:start', session, mode, chars }).then(
+    (r) => ready(r.type === 'hints:started' ? r.total : 0),
+    // No background worker (shouldn't happen): hint this frame on its own.
+    async () => {
+      const total = await prepare(session);
+      show({ type: 'hints:show', session, offset: 0, total, chars, mode });
+      ready(total);
+    },
+  );
 }

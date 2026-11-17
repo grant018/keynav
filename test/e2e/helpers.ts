@@ -37,8 +37,9 @@ export const readHints = (page: Page) =>
 /** Presses the hint key (f or Shift+F) and returns the hints shown. */
 export async function showHints(page: Page, key = 'f'): Promise<HintInfo[]> {
   await page.keyboard.press(key);
-  const hints = await readHints(page);
-  expect(hints).not.toBeNull();
+  // Hints appear once every frame has been asked (a background round trip).
+  let hints: HintInfo[] | null = null;
+  await expect.poll(async () => (hints = await readHints(page)) !== null, { timeout: 3000 }).toBe(true);
   return hints!;
 }
 

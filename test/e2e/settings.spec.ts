@@ -271,12 +271,9 @@ test.describe('settings page', () => {
 test('picking still works with custom settings (sanity)', async ({ serviceWorker: sw, page }) => {
   await page.goto(`${PAGES}/hints.html`);
   await setSettings(sw, page, { hintChars: 'jk', keyMappings: 'unmap f\nmap ; linkHints' });
-  await page.keyboard.press(';');
-  const hints = await readHints(page);
-  expect(hints).not.toBeNull();
+  await showHints(page, ';');
   await page.keyboard.press('Escape');
-  await page.keyboard.press(';');
-  const target = (await readHints(page))!.find((h) => h.target === 'checkbox')!;
+  const target = (await showHints(page, ';')).find((h) => h.target === 'checkbox')!;
   await page.keyboard.type(target.label);
   await expect(page.locator('#checkbox')).toBeChecked();
 });

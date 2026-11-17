@@ -1,7 +1,8 @@
 // Content script entry. Runs at document_start in every frame, before any page
 // script, so our capture listeners on window see keys before the page's do. Nothing
 // here touches the DOM until a key is pressed.
-import { send } from '../shared/messages';
+import { send, type HintEvent } from '../shared/messages';
+import { handleHintEvent, prepare } from './hints/session';
 import { resolveBindings } from './bindings';
 import { Dispatcher } from './keys/dispatcher';
 import { noteInteraction } from './scroll/scroller';
@@ -14,6 +15,20 @@ const dispatcher = new Dispatcher(resolveBindings(currentKeymap().keys), current
 // on the options page reaches this tab immediately.
 initSettings();
 whenSettingsChange(() => dispatcher.setBindings(resolveBindings(currentKeymap().keys)));
+
+// Link hints span every frame in the tab; the background worker relays the session.
+try {
+  chrome.runtime.onMessage.addListener((ev: HintEvent, _sender, reply: (r: unknown) => void) => {
+    if (ev.type === 'hints:prepare') {
+      prepare(ev.session).then((count) => reply({ type: 'hints:count', count }));
+      return true; // reply asynchronously
+    }
+    if (ev.type?.startsWith('hints:')) handleHintEvent(ev);
+    return false;
+  });
+} catch {
+  // Orphaned script: no messaging.
+}
 
 const listeners: [string, (e: Event) => void][] = [
   ['keydown', (e) => (extensionAlive() ? dispatcher.onKeyDown(e as KeyboardEvent) : teardown())],

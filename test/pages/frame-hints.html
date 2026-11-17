@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>frame with hints</title>
+<style>body { font: 13px sans-serif; margin: 6px; }</style>
+<a id="f-link" href="frame.html?from-frame">frame link</a>
+<button id="f-button">frame button</button>
+<input id="f-input" placeholder="frame input">
+<script>
+  window.__events = [];
+  window.__log = [];
+  for (const type of ['keydown', 'keypress', 'keyup']) {
+    window.addEventListener(type, (e) => window.__log.push(`${type}:${e.key}`), true);
+  }
+  document.getElementById('f-button').addEventListener('click', () => window.__events.push('f-button'));
+</script>

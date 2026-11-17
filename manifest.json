@@ -3,7 +3,7 @@
   "name": "KeyNav",
   "version": "0.1.0",
   "description": "Navigate the web with the keyboard.",
-  "permissions": ["sessions", "storage"],
+  "permissions": ["sessions", "storage", "webNavigation"],
   "background": {
     "service_worker": "background.js",
     "type": "module"

@@ -142,6 +142,7 @@ test.describe('hints page', () => {
 test('nothing to hint: f does nothing', async ({ serviceWorker: _sw, page }) => {
   await page.goto(`${PAGES}/empty.html`);
   await page.keyboard.press('f');
+  await page.waitForTimeout(300); // every frame has answered by now
   expect(await readHints(page)).toBeNull();
   await page.keyboard.press('q');
   expect(await page.evaluate(() => window.__log)).toEqual(['keydown:q', 'keypress:q', 'keyup:q']);

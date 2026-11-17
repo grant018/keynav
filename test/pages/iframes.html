@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>iframes</title>
+<!-- localhost and 127.0.0.1 are different origins, so ?cross and ?nested are cross-origin. -->
+<style>
+  body { font: 14px sans-serif; }
+  iframe { width: 420px; height: 110px; border: 1px solid #999; display: block; margin: 6px 0; }
+</style>
+<p><a id="top-link" href="frame.html?top">top-level link</a> <button id="top-button">top button</button></p>
+<iframe id="same" src="frame-hints.html?same"></iframe>
+<iframe id="cross" src="http://localhost:8765/frame-hints.html?cross"></iframe>
+<iframe id="srcdoc" srcdoc="<button id='srcdoc-button' onclick='(window.__events ??= []).push(this.id)'>srcdoc button</button>"></iframe>
+<iframe id="outer" src="http://localhost:8765/frame-nest.html" style="height: 150px"></iframe>
+<iframe id="hidden" src="frame-hints.html?hidden" style="display: none"></iframe>
+<iframe id="below" src="frame-hints.html?below" style="margin-top: 3000px"></iframe>
